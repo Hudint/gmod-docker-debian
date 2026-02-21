@@ -1,0 +1,14 @@
+services:
+  gmod:
+    build: .
+    stdin_open: true
+    tty: true
+    environment:
+        - GMOD_SERVERNAME=Servername
+        - GMOD_SV_PASSWORD=password
+        - GMOD_GAMEMODE=terrortown
+        #- GMOD_DISABLE_UPDATE=1
+        #- GMOD_DISABLE_UPDATE_OTHERS=1
+        #- GMOD_MAP=gm_construct
+        - GMOD_MAXPLAYERS=32
+        - GMOD_WORKSHOP_COLLECTION=2607308428
