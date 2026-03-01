@@ -16,9 +16,10 @@ withRetries() {
 
         "$@"
         
-        echo "Exit code: $?"
+        local returnCode=$?
+        echo "Exit code: $returnCode"
 
-        if [ $? -eq 0 ]; then
+        if [ $returnCode -eq 0 ]; then
             echo "Command succeeded!"
             return 0
         fi
@@ -46,15 +47,6 @@ if [ -z "${GMOD_DISABLE_UPDATE}" ]; then
     +app_update ${GMODID} validate +quit
 fi
 
-# Update Garry's Mod
-if [ -z "${GMOD_DISABLE_UPDATE}" ]; then
-    echo "Updating Garry's Mod..."
-    withRetries 5 ${DIR_STEAMCMD}/steamcmd.sh \
-    +force_install_dir ${DIR_GMOD} \
-    +login anonymous \
-    +app_update ${GMODID} validate +quit
-fi
-
 # Update other game content
 if [ -z "${GMOD_DISABLE_UPDATE_OTHERS}" ]; then
     echo "Updating CSS..."
@@ -76,18 +68,22 @@ if [ -f "${MOUNTCFG}" ]; then
     cp "${MOUNTCFG}" "${MOUNTCFG}.bak"
 
     # Update mount points safely
-    if ! grep -q '"cstrike"\s"'"${DIR_CSS}"'/cstrike"' "${MOUNTCFG}"; then
-        echo "Adding CSS mount point..."
-        sed -i.tmp '/"cstrike"/d' "${MOUNTCFG}"
-        sed -i.tmp '/^\s*}/ i   "cstrike"       "'"${DIR_CSS}"'/cstrike"' "${MOUNTCFG}"
-        rm -f "${MOUNTCFG}.tmp"
+    if [ "${MOUNT_CSS}" -eq "1" ]; then
+        if ! grep -q '"cstrike"\s"'"${DIR_CSS}"'/cstrike"' "${MOUNTCFG}"; then
+            echo "Adding CSS mount point..."
+            sed -i.tmp '/"cstrike"/d' "${MOUNTCFG}"
+            sed -i.tmp '/^\s*}/ i   "cstrike"       "'"${DIR_CSS}"'/cstrike"' "${MOUNTCFG}"
+            rm -f "${MOUNTCFG}.tmp"
+        fi
     fi
 
-    if ! grep -q '"tf"\s"'"${DIR_TF2}"'/tf"' "${MOUNTCFG}"; then
-        echo "Adding TF2 mount point..."
-        sed -i.tmp '/"tf"/d' "${MOUNTCFG}"
-        sed -i.tmp '/^\s*}/ i   "tf"    "'"${DIR_TF2}"'/tf"' "${MOUNTCFG}"
-        rm -f "${MOUNTCFG}.tmp"
+    if [ "${MOUNT_TF2}" -eq "1" ]; then
+        if ! grep -q '"tf"\s"'"${DIR_TF2}"'/tf"' "${MOUNTCFG}"; then
+            echo "Adding TF2 mount point..."
+            sed -i.tmp '/"tf"/d' "${MOUNTCFG}"
+            sed -i.tmp '/^\s*}/ i   "tf"    "'"${DIR_TF2}"'/tf"' "${MOUNTCFG}"
+            rm -f "${MOUNTCFG}.tmp"
+        fi
     fi
 else
     echo "Creating new mount.cfg..."
@@ -102,10 +98,11 @@ ARGS="-steam_dir ${DIR_STEAMCMD} \
     -steamcmd_script /include/autoupdatescript.txt \
     -autoupdate \
     -debug \
+    -disableluarefresh \
     +hostname \"${GMOD_SERVERNAME}\" \
     +maxplayers ${GMOD_MAXPLAYERS} \
     +map ${GMOD_MAP} \
-    +gamemode ${GMOD_GAMEMODE}"
+    +gamemode ${GMOD_GAMEMODE}" 
 
 if [ -n "${GMOD_WORKSHOP_COLLECTION}" ]; then
     ARGS="${ARGS} +host_workshop_collection ${GMOD_WORKSHOP_COLLECTION}"
