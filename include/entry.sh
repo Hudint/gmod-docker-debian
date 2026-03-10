@@ -2,6 +2,9 @@
 
 set -e
 
+export HOME=/tmp/home
+mkdir -p /tmp/home
+
 echo "Starting Garry's Mod server setup..."
 echo "Current UserID: $UID"
 
