@@ -3,12 +3,11 @@
 A Docker image to run a Garry's Mod dedicated server.
 
 ## Dockerhub
-The image is available at `hudint/gmod-debian`.
+The image is available at `ghcr.io/hudint/gmod-docker-debian:latest`.
 So you can pull the image via:
 ```
-docker pull hudint/gmod-debian
+docker pull ghcr.io/hudint/gmod-docker-debian:latest
 ```
-
 ## Why this image?
 
 This image does **not** enforce a specific user, so you can set any UID/GID you
